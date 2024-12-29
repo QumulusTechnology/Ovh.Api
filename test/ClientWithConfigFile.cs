@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Ovh.Api;
 using Ovh.Api.Exceptions;
 
@@ -64,27 +65,27 @@ namespace Ovh.Test
         public void ValidConfigFileWithEndpointOnly()
         {
             CreateConfigFileWithEndpointOnly();
-            Client client = new Client();
-            Assert.AreEqual(client.Endpoint, "https://eu.api.ovh.com/1.0/");
+            var client = new Client();
+            ClassicAssert.AreEqual(client.Endpoint, "https://eu.api.ovh.com/1.0/");
         }
 
         [Test]
         public void ValidConfigFileWithSpecificFileName()
         {
             CreateConfigFileWithSpecificFileName(CustomConfigFile);
-            Client client = new Client(confFileName: CustomConfigFile);
-            Assert.AreEqual(client.Endpoint, "https://eu.api.ovh.com/1.0/");
+            var client = new Client(confFileName: CustomConfigFile);
+            ClassicAssert.AreEqual(client.Endpoint, "https://eu.api.ovh.com/1.0/");
         }
 
         [Test]
         public void ValidConfigFileWithAllValues()
         {
             CreateConfigFileWithAllValues();
-            Client client = new Client();
-            Assert.AreEqual(client.Endpoint, "https://eu.api.ovh.com/1.0/");
-            Assert.AreEqual(client.ApplicationKey, "my_app_key");
-            Assert.AreEqual(client.ApplicationSecret, "my_application_secret");
-            Assert.AreEqual(client.ConsumerKey, "my_consumer_key");
+            var client = new Client();
+            ClassicAssert.AreEqual(client.Endpoint, "https://eu.api.ovh.com/1.0/");
+            ClassicAssert.AreEqual(client.ApplicationKey, "my_app_key");
+            ClassicAssert.AreEqual(client.ApplicationSecret, "my_application_secret");
+            ClassicAssert.AreEqual(client.ConsumerKey, "my_consumer_key");
         }
     }
 }

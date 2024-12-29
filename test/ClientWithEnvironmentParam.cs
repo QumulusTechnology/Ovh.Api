@@ -1,6 +1,7 @@
 using Ovh.Api;
 using System;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Ovh.Test
 {
@@ -32,19 +33,19 @@ namespace Ovh.Test
         [Test]
         public void ValidEndpoint()
         {
-            Client client = new Client();
-            Assert.AreEqual(client.Endpoint, "https://eu.api.ovh.com/1.0/");
+            var client = new Client();
+            ClassicAssert.AreEqual(client.Endpoint, "https://eu.api.ovh.com/1.0/");
         }
 
         [Test]
         public void AllParams()
         {
             AddOtherParamsToEnv();
-            Client client = new Client();
-            Assert.AreEqual(client.Endpoint, "https://eu.api.ovh.com/1.0/");
-            Assert.AreEqual(client.ApplicationKey, "my_app_key");
-            Assert.AreEqual(client.ApplicationSecret, "my_application_secret");
-            Assert.AreEqual(client.ConsumerKey, "my_consumer_key");
+            var client = new Client();
+            ClassicAssert.AreEqual(client.Endpoint, "https://eu.api.ovh.com/1.0/");
+            ClassicAssert.AreEqual(client.ApplicationKey, "my_app_key");
+            ClassicAssert.AreEqual(client.ApplicationSecret, "my_application_secret");
+            ClassicAssert.AreEqual(client.ConsumerKey, "my_consumer_key");
         }
     }
 }

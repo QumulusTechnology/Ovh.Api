@@ -6,6 +6,7 @@ using System;
 using FakeItEasy;
 using System.Linq;
 using System.Threading.Tasks;
+using NUnit.Framework.Legacy;
 
 namespace Ovh.Test
 {
@@ -43,7 +44,7 @@ namespace Ovh.Test
 
             var c = ClientFactory.GetClient(fake);
             var result = await c.DeleteAsync("/ip/127.0.0.1");
-            Assert.AreEqual(Responses.Delete.nullAsJsonString, result);
+            ClassicAssert.AreEqual(Responses.Delete.nullAsJsonString, result);
 
             var meCall = Fake.GetCalls(fake).Where(call =>
                 call.Method.Name == "Send" &&
@@ -52,10 +53,10 @@ namespace Ovh.Test
             var requestMessage = meCall.GetArgument<HttpRequestMessage>("request");
             var headers = requestMessage.Headers;
             Assert.Multiple(() => {
-                Assert.AreEqual(Constants.APPLICATION_KEY, headers.GetValues(Client.OVH_APP_HEADER).First());
-                Assert.AreEqual(Constants.CONSUMER_KEY, headers.GetValues(Client.OVH_CONSUMER_HEADER).First());
-                Assert.AreEqual(currentServerTimestamp.ToString(), headers.GetValues(Client.OVH_TIME_HEADER).First());
-                Assert.AreEqual("$1$610ebc657a19d6b444264f998291a4f24bc3227d", headers.GetValues(Client.OVH_SIGNATURE_HEADER).First());
+                ClassicAssert.AreEqual(Constants.APPLICATION_KEY, headers.GetValues(Client.OVH_APP_HEADER).First());
+                ClassicAssert.AreEqual(Constants.CONSUMER_KEY, headers.GetValues(Client.OVH_CONSUMER_HEADER).First());
+                ClassicAssert.AreEqual(currentServerTimestamp.ToString(), headers.GetValues(Client.OVH_TIME_HEADER).First());
+                ClassicAssert.AreEqual("$1$610ebc657a19d6b444264f998291a4f24bc3227d", headers.GetValues(Client.OVH_SIGNATURE_HEADER).First());
             });
         }
 
@@ -76,7 +77,7 @@ namespace Ovh.Test
             queryParams.Add("filter", "value:&é'-");
             queryParams.Add("anotherfilter", "=test");
             var result = await c.DeleteAsync<object>("/ip/127.0.0.1");
-            Assert.IsNull(result);
+            ClassicAssert.IsNull(result);
         }
     }
 }

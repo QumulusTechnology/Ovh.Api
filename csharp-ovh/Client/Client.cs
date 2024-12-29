@@ -40,6 +40,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using TimeProvider = Ovh.Api.Testing.TimeProvider;
 
 namespace Ovh.Api
 {
@@ -228,12 +229,12 @@ namespace Ovh.Api
         public static string GenerateSignature(string applicationSecret, string consumerKey,
             long currentTimestamp, string method, string target, string data = null)
         {
-            SHA1Managed sha1Hasher = new SHA1Managed();
-            string toSign =
+            var sha1Hasher = new SHA1Managed();
+            var toSign =
                 string.Join("+", applicationSecret, consumerKey, method,
                 target, data, currentTimestamp);
-            byte[] binaryHash = sha1Hasher.ComputeHash(Encoding.UTF8.GetBytes(toSign));
-            string signature = string.Join("",
+            var binaryHash = sha1Hasher.ComputeHash(Encoding.UTF8.GetBytes(toSign));
+            var signature = string.Join("",
                 binaryHash.Select(x => x.ToString("X2"))).ToLower();
             return $"$1${signature}";
         }
@@ -278,8 +279,8 @@ namespace Ovh.Api
                 throw new InvalidKeyException("ConsumerKey is missing.");
             }
 
-            long currentTimestamp = _timeProvider.UtcNow.ToUnixTimeSeconds() + await GetTimeDelta().ConfigureAwait(false);
-            string signature = GenerateSignature(
+            var currentTimestamp = _timeProvider.UtcNow.ToUnixTimeSeconds() + await GetTimeDelta().ConfigureAwait(false);
+            var signature = GenerateSignature(
                 applicationSecret: ApplicationSecret,
                 consumerKey: ConsumerKey,
                 currentTimestamp: currentTimestamp,
@@ -339,7 +340,7 @@ namespace Ovh.Api
             {
                 var httpMethod = new HttpMethod(method);
                 var target = GetTarget(path);
-                HttpRequestMessage msg = new HttpRequestMessage(httpMethod, target);
+                var msg = new HttpRequestMessage(httpMethod, target);
                 if (httpMethod != HttpMethod.Get && data != null)
                 {
                     msg.Content = new StringContent(data ?? "", Encoding.UTF8, "application/json");
@@ -376,9 +377,9 @@ namespace Ovh.Api
         private async Task<ApiException> ExtractExceptionFromHttpResponse(HttpResponseMessage response)
         {
             var responseStr = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            JObject responseObject = JsonConvert.DeserializeObject<JObject>(responseStr);
-            string message = "";
-            string errorCode = "";
+            var responseObject = JsonConvert.DeserializeObject<JObject>(responseStr);
+            var message = "";
+            var errorCode = "";
 
             if (responseObject["message"] != null)
             {
@@ -445,8 +446,8 @@ namespace Ovh.Api
 
         private async Task<long> ComputeTimeDelta()
         {
-            long serverUnixTimestamp = await GetAsync<long>("/auth/time", null, false).ConfigureAwait(false);
-            long currentUnixTimestamp = _timeProvider.UtcNow.ToUnixTimeSeconds();
+            var serverUnixTimestamp = await GetAsync<long>("/auth/time", null, false).ConfigureAwait(false);
+            var currentUnixTimestamp = _timeProvider.UtcNow.ToUnixTimeSeconds();
             return serverUnixTimestamp - currentUnixTimestamp;
         }
     }

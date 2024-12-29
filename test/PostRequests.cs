@@ -8,6 +8,7 @@ using System.Linq;
 using Ovh.Test.Models;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using NUnit.Framework.Legacy;
 
 namespace Ovh.Test
 {
@@ -44,7 +45,7 @@ namespace Ovh.Test
 
             var c = ClientFactory.GetClient(testHandler).AsTestable(timeProvider);
             var result = await c.PostAsync("/me/geolocation", null);
-            Assert.AreEqual(Responses.Post.me_geolocation_content, result);
+            ClassicAssert.AreEqual(Responses.Post.me_geolocation_content, result);
 
             var geolocCall = Fake.GetCalls(testHandler).Where(call =>
                 call.Method.Name == "Send" &&
@@ -53,10 +54,10 @@ namespace Ovh.Test
             var requestMessage = geolocCall.GetArgument<HttpRequestMessage>("request");
             var headers = requestMessage.Headers;
             Assert.Multiple(() => {
-                Assert.AreEqual(Constants.APPLICATION_KEY, headers.GetValues(Client.OVH_APP_HEADER).First());
-                Assert.AreEqual(Constants.CONSUMER_KEY, headers.GetValues(Client.OVH_CONSUMER_HEADER).First());
-                Assert.AreEqual(currentServerTimestamp.ToString(), headers.GetValues(Client.OVH_TIME_HEADER).First());
-                Assert.AreEqual("$1$3473ad8790d09e6d28f8a9d6f09a05c1f5f0bbfc", headers.GetValues(Client.OVH_SIGNATURE_HEADER).First());
+                ClassicAssert.AreEqual(Constants.APPLICATION_KEY, headers.GetValues(Client.OVH_APP_HEADER).First());
+                ClassicAssert.AreEqual(Constants.CONSUMER_KEY, headers.GetValues(Client.OVH_CONSUMER_HEADER).First());
+                ClassicAssert.AreEqual(currentServerTimestamp.ToString(), headers.GetValues(Client.OVH_TIME_HEADER).First());
+                ClassicAssert.AreEqual("$1$3473ad8790d09e6d28f8a9d6f09a05c1f5f0bbfc", headers.GetValues(Client.OVH_SIGNATURE_HEADER).First());
             });
         }
 
@@ -72,9 +73,9 @@ namespace Ovh.Test
 
             var c = ClientFactory.GetClient(testHandler).AsTestable(timeProvider);
             var result = await c.PostAsync<Geolocation>("/me/geolocation");
-            Assert.AreEqual("eo", result.countryCode);
-            Assert.AreEqual("256.0.0.1", result.ip);
-            Assert.AreEqual("Atlantis", result.continent);
+            ClassicAssert.AreEqual("eo", result.countryCode);
+            ClassicAssert.AreEqual("256.0.0.1", result.ip);
+            ClassicAssert.AreEqual("Atlantis", result.continent);
         }
 
         [Test]
@@ -89,7 +90,7 @@ namespace Ovh.Test
 
             var c = ClientFactory.GetClient(testHandler).AsTestable(timeProvider);
             var result = await c.PostStringAsync("/me/contact", "Fake content");
-            Assert.AreEqual(Responses.Post.me_contact_content, result);
+            ClassicAssert.AreEqual(Responses.Post.me_contact_content, result);
 
             var contactCall = Fake.GetCalls(testHandler).Where(call =>
                 call.Method.Name == "Send" &&
@@ -98,10 +99,10 @@ namespace Ovh.Test
             var requestMessage = contactCall.GetArgument<HttpRequestMessage>("request");
             var headers = requestMessage.Headers;
             Assert.Multiple(() => {
-                Assert.AreEqual(Constants.APPLICATION_KEY, headers.GetValues(Client.OVH_APP_HEADER).First());
-                Assert.AreEqual(Constants.CONSUMER_KEY, headers.GetValues(Client.OVH_CONSUMER_HEADER).First());
-                Assert.AreEqual(currentServerTimestamp.ToString(), headers.GetValues(Client.OVH_TIME_HEADER).First());
-                Assert.AreEqual("$1$19a8f2db1a3b2b89b231c7872332b6ba117d8bd7", headers.GetValues(Client.OVH_SIGNATURE_HEADER).First());
+                ClassicAssert.AreEqual(Constants.APPLICATION_KEY, headers.GetValues(Client.OVH_APP_HEADER).First());
+                ClassicAssert.AreEqual(Constants.CONSUMER_KEY, headers.GetValues(Client.OVH_CONSUMER_HEADER).First());
+                ClassicAssert.AreEqual(currentServerTimestamp.ToString(), headers.GetValues(Client.OVH_TIME_HEADER).First());
+                ClassicAssert.AreEqual("$1$19a8f2db1a3b2b89b231c7872332b6ba117d8bd7", headers.GetValues(Client.OVH_SIGNATURE_HEADER).First());
             });
         }
 
@@ -117,7 +118,7 @@ namespace Ovh.Test
 
             var c = ClientFactory.GetClient(testHandler).AsTestable(timeProvider);
             var result = await c.PostAsync<Contact>("/me/contact", "Fake content");
-            Assert.AreEqual("deleteme@deleteme.deleteme", result.email);
+            ClassicAssert.AreEqual("deleteme@deleteme.deleteme", result.email);
 
             var contactCall = Fake.GetCalls(testHandler).Where(call =>
                 call.Method.Name == "Send" &&
@@ -126,10 +127,10 @@ namespace Ovh.Test
             var requestMessage = contactCall.GetArgument<HttpRequestMessage>("request");
             var headers = requestMessage.Headers;
             Assert.Multiple(() => {
-                Assert.AreEqual(Constants.APPLICATION_KEY, headers.GetValues(Client.OVH_APP_HEADER).First());
-                Assert.AreEqual(Constants.CONSUMER_KEY, headers.GetValues(Client.OVH_CONSUMER_HEADER).First());
-                Assert.AreEqual(currentServerTimestamp.ToString(), headers.GetValues(Client.OVH_TIME_HEADER).First());
-                Assert.AreEqual("$1$8a6f2668c14048c59ca957bc26b16a29180ffb03", headers.GetValues(Client.OVH_SIGNATURE_HEADER).First());
+                ClassicAssert.AreEqual(Constants.APPLICATION_KEY, headers.GetValues(Client.OVH_APP_HEADER).First());
+                ClassicAssert.AreEqual(Constants.CONSUMER_KEY, headers.GetValues(Client.OVH_CONSUMER_HEADER).First());
+                ClassicAssert.AreEqual(currentServerTimestamp.ToString(), headers.GetValues(Client.OVH_TIME_HEADER).First());
+                ClassicAssert.AreEqual("$1$8a6f2668c14048c59ca957bc26b16a29180ffb03", headers.GetValues(Client.OVH_SIGNATURE_HEADER).First());
             });
         }
 
@@ -145,7 +146,7 @@ namespace Ovh.Test
 
             var c = ClientFactory.GetClient(testHandler).AsTestable(timeProvider);
             var result = await c.PostAsync("/me/contact", "Fake content");
-            Assert.AreEqual(Responses.Post.me_contact_content, result);
+            ClassicAssert.AreEqual(Responses.Post.me_contact_content, result);
 
             var contactCall = Fake.GetCalls(testHandler).Where(call =>
                 call.Method.Name == "Send" &&
@@ -154,10 +155,10 @@ namespace Ovh.Test
             var requestMessage = contactCall.GetArgument<HttpRequestMessage>("request");
             var headers = requestMessage.Headers;
             Assert.Multiple(() => {
-                Assert.AreEqual(Constants.APPLICATION_KEY, headers.GetValues(Client.OVH_APP_HEADER).First());
-                Assert.AreEqual(Constants.CONSUMER_KEY, headers.GetValues(Client.OVH_CONSUMER_HEADER).First());
-                Assert.AreEqual(currentServerTimestamp.ToString(), headers.GetValues(Client.OVH_TIME_HEADER).First());
-                Assert.AreEqual("$1$8a6f2668c14048c59ca957bc26b16a29180ffb03", headers.GetValues(Client.OVH_SIGNATURE_HEADER).First());
+                ClassicAssert.AreEqual(Constants.APPLICATION_KEY, headers.GetValues(Client.OVH_APP_HEADER).First());
+                ClassicAssert.AreEqual(Constants.CONSUMER_KEY, headers.GetValues(Client.OVH_CONSUMER_HEADER).First());
+                ClassicAssert.AreEqual(currentServerTimestamp.ToString(), headers.GetValues(Client.OVH_TIME_HEADER).First());
+                ClassicAssert.AreEqual("$1$8a6f2668c14048c59ca957bc26b16a29180ffb03", headers.GetValues(Client.OVH_SIGNATURE_HEADER).First());
             });
         }
 
@@ -189,7 +190,7 @@ namespace Ovh.Test
             var result = await c.PostAsync<Contact>("/me/contact", dummyContact);
 
             //Ensure that the call went through correctly
-            Assert.AreEqual(123456, result.id);
+            ClassicAssert.AreEqual(123456, result.id);
 
             var contactCall = Fake.GetCalls(testHandler).Where(call =>
                 call.Method.Name == "Send" &&
@@ -199,9 +200,9 @@ namespace Ovh.Test
 
             // Ensure that we sent a serialized version of the dummy contact
             var sendtObject = JsonConvert.DeserializeObject<Contact>(await requestMessage.Content.ReadAsStringAsync());
-            Assert.AreEqual(dummyContact.address.country, sendtObject.address.country);
-            Assert.AreEqual(dummyContact.address.zip, sendtObject.address.zip);
-            Assert.AreEqual(dummyContact.email, sendtObject.email);
+            ClassicAssert.AreEqual(dummyContact.address.country, sendtObject.address.country);
+            ClassicAssert.AreEqual(dummyContact.address.zip, sendtObject.address.zip);
+            ClassicAssert.AreEqual(dummyContact.email, sendtObject.email);
         }
     }
 }

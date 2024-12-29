@@ -83,7 +83,7 @@ namespace Ovh.Api
         /// </summary>
         public ConfigurationManager(string confFileName)
         {
-            string chosenPath = _configPaths.LastOrDefault(p => File.Exists(Path.Combine(p, confFileName)));
+            var chosenPath = _configPaths.LastOrDefault(p => File.Exists(Path.Combine(p, confFileName)));
             if (chosenPath == null)
             {
                 Config = new ConfigurationBuilder().Build();
@@ -141,13 +141,13 @@ namespace Ovh.Api
         /// <exception cref="KeyNotFoundException">Configuration key is missing</exception>
         public string Get(string section, string name)
         {
-            string envValue = Environment.GetEnvironmentVariable("OVH_" + name.ToUpper());
+            var envValue = Environment.GetEnvironmentVariable("OVH_" + name.ToUpper());
             if(envValue != null)
             {
                 return envValue;
             }
 
-            IConfigurationSection sectionData = Config
+            var sectionData = Config
                 .GetChildren()
                 .FirstOrDefault(s => s.Key == section);
 
@@ -157,7 +157,7 @@ namespace Ovh.Api
                     string.Format($"Could not find configuration section {section}"));
             }
 
-            IConfigurationSection value = sectionData.GetSection(name);
+            var value = sectionData.GetSection(name);
             if (value.Value == null)
             {
                 throw new ConfigurationKeyMissingException(

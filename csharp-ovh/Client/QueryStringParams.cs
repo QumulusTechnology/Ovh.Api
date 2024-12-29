@@ -23,7 +23,7 @@ namespace Ovh.Api
             var sb = new StringBuilder();
             sb.Append("?");
 
-            bool firstParam = true;
+            var firstParam = true;
 
             foreach (var param in this)
             {

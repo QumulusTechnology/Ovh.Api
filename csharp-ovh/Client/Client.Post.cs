@@ -29,7 +29,7 @@ namespace Ovh.Api
         /// <returns>Raw API response</returns>
         public Task<string> PostAsync(string target, object data = null, bool needAuth = true, TimeSpan? timeout = null)
         {
-            string json = data is null ? null : JsonConvert.SerializeObject(data);
+            var json = data is null ? null : JsonConvert.SerializeObject(data);
             return CallAsync("POST", target, json, needAuth, timeout: timeout);
         }
 
@@ -58,7 +58,7 @@ namespace Ovh.Api
         /// <returns>API response deserialized to T by JSON.Net with Strongly typed object as input</returns>
         public Task<T> PostAsync<T>(string target, object data = null, bool needAuth = true, TimeSpan? timeout = null)
         {
-            string json = data is null ? null : JsonConvert.SerializeObject(data);
+            var json = data is null ? null : JsonConvert.SerializeObject(data);
             return CallAsync<T>("POST", target, json, needAuth, timeout: timeout);
         }
     }

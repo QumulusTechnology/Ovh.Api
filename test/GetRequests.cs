@@ -8,6 +8,7 @@ using System.Linq;
 using Ovh.Test.Models;
 using System.Threading.Tasks;
 using System.Threading;
+using NUnit.Framework.Legacy;
 
 namespace Ovh.Test
 {
@@ -41,7 +42,7 @@ namespace Ovh.Test
             var httpClient = new HttpClient(testHandler);
             var c = new Client("ovh-eu", httpClient: httpClient).AsTestable(timeProvider);
 
-            Assert.AreEqual(2, await c.GetTimeDelta());
+            ClassicAssert.AreEqual(2, await c.GetTimeDelta());
         }
 
         [Test]
@@ -62,7 +63,7 @@ namespace Ovh.Test
             var c = ClientFactory.GetClient(fake);
 
             var result = await c.GetAsync(call);
-            Assert.AreEqual(Responses.Get.me_content, result);
+            ClassicAssert.AreEqual(Responses.Get.me_content, result);
 
             var meCall = Fake.GetCalls(fake).Where(call =>
                 call.Method.Name == "Send" &&
@@ -71,14 +72,14 @@ namespace Ovh.Test
             var requestMessage = meCall.GetArgument<HttpRequestMessage>("request");
 
 	    var uri = requestMessage.RequestUri;
-	    Assert.AreEqual(called, uri.AbsoluteUri);
+        ClassicAssert.AreEqual(called, uri.AbsoluteUri);
 
             var headers = requestMessage.Headers;
             Assert.Multiple(() => {
-                Assert.AreEqual(Constants.APPLICATION_KEY, headers.GetValues(Client.OVH_APP_HEADER).First());
-                Assert.AreEqual(Constants.CONSUMER_KEY, headers.GetValues(Client.OVH_CONSUMER_HEADER).First());
-                Assert.AreEqual(currentServerTimestamp.ToString(), headers.GetValues(Client.OVH_TIME_HEADER).First());
-                Assert.AreEqual(sig, headers.GetValues(Client.OVH_SIGNATURE_HEADER).First());
+                ClassicAssert.AreEqual(Constants.APPLICATION_KEY, headers.GetValues(Client.OVH_APP_HEADER).First());
+                ClassicAssert.AreEqual(Constants.CONSUMER_KEY, headers.GetValues(Client.OVH_CONSUMER_HEADER).First());
+                ClassicAssert.AreEqual(currentServerTimestamp.ToString(), headers.GetValues(Client.OVH_TIME_HEADER).First());
+                ClassicAssert.AreEqual(sig, headers.GetValues(Client.OVH_SIGNATURE_HEADER).First());
             });
         }
 
@@ -113,10 +114,10 @@ namespace Ovh.Test
             var c = ClientFactory.GetClient(fake);
             var result = await c.GetAsync<Me>("/me");
 
-            Assert.AreEqual("Noname", result.name);
-            Assert.AreEqual("none-ovh", result.nichandle);
-            Assert.AreEqual("EUR", result.currency.code);
-            Assert.AreEqual("€", result.currency.symbol);
+            ClassicAssert.AreEqual("Noname", result.name);
+            ClassicAssert.AreEqual("none-ovh", result.nichandle);
+            ClassicAssert.AreEqual("EUR", result.currency.code);
+            ClassicAssert.AreEqual("€", result.currency.symbol);
         }
 
         [Test]
@@ -138,13 +139,12 @@ namespace Ovh.Test
             _ = await c.GetAsync("/route", queryParams);
 
 
-            var meCall = Fake.GetCalls(fake).Where(call =>
-                call.Method.Name == "Send" &&
-                call.GetArgument<HttpRequestMessage>("request").RequestUri.ToString().Contains("/route")).First();
+            var meCall = Fake.GetCalls(fake).First(call => call.Method.Name == "Send" &&
+                                                           call.GetArgument<HttpRequestMessage>("request").RequestUri.ToString().Contains("/route"));
 
             var requestMessage = meCall.GetArgument<HttpRequestMessage>("request");
             var headers = requestMessage.Headers;
-            Assert.AreEqual("$1$098b93d342b6db4848ec448063be2b6884e94723", headers.GetValues(Client.OVH_SIGNATURE_HEADER).First());
+            ClassicAssert.AreEqual("$1$098b93d342b6db4848ec448063be2b6884e94723", headers.GetValues(Client.OVH_SIGNATURE_HEADER).First());
         }
     }
 }

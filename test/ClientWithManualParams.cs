@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Ovh.Api;
 using Ovh.Api.Exceptions;
 using System;
@@ -17,17 +18,17 @@ namespace Ovh.Test
         [Test]
         public void ValidEndpointParam()
         {
-            Client client = new Client("ovh-eu");
-            Assert.AreEqual(client.Endpoint, "https://eu.api.ovh.com/1.0/");
+            var client = new Client("ovh-eu");
+            ClassicAssert.AreEqual(client.Endpoint, "https://eu.api.ovh.com/1.0/");
         }
 
         [Test]
         public void ValidParams()
         {
-            Client client =
+            var client =
                 new Client("ovh-eu", "applicationKey", "secretKey",
                     "consumerKey", defaultTimeout: TimeSpan.FromSeconds(120));
-            Assert.AreEqual(client.Endpoint, "https://eu.api.ovh.com/1.0/");
+            ClassicAssert.AreEqual(client.Endpoint, "https://eu.api.ovh.com/1.0/");
         }
 
         [Test]

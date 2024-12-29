@@ -1,5 +1,6 @@
 using System.Net.Http;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Ovh.Api;
 
 namespace Ovh.Test
@@ -24,7 +25,7 @@ namespace Ovh.Test
                 "GET",
                 target);
 
-            Assert.AreEqual(expectedSignature, sig);
+            ClassicAssert.AreEqual(expectedSignature, sig);
         }
 
         [Test]
@@ -42,7 +43,7 @@ namespace Ovh.Test
                 "DELETE",
                 target);
 
-            Assert.AreEqual(expectedSignature, sig);
+            ClassicAssert.AreEqual(expectedSignature, sig);
         }
 
         [Test]
@@ -60,7 +61,7 @@ namespace Ovh.Test
                 "POST",
                 target);
 
-            Assert.AreEqual(expectedSignature, sig);
+            ClassicAssert.AreEqual(expectedSignature, sig);
         }
 
         [Test]
@@ -79,7 +80,7 @@ namespace Ovh.Test
                 target,
                 data);
 
-            Assert.AreEqual(expectedSignature, sig);
+            ClassicAssert.AreEqual(expectedSignature, sig);
         }
 
         [Test]
@@ -97,7 +98,7 @@ namespace Ovh.Test
                 "PUT",
                 target);
 
-            Assert.AreEqual(expectedSignature, sig);
+            ClassicAssert.AreEqual(expectedSignature, sig);
         }
 
         [Test]
@@ -116,7 +117,7 @@ namespace Ovh.Test
                 target,
                 data);
 
-            Assert.AreEqual(expectedSignature, sig);
+            ClassicAssert.AreEqual(expectedSignature, sig);
         }
 
     }
