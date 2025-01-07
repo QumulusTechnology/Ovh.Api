@@ -26,102 +26,103 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 
-namespace Ovh.Api.Models
+namespace Ovh.Api.Models;
+
+/// <summary>
+/// Class that represents the data to send to API /auth
+/// </summary>
+public class CredentialRequest
 {
     /// <summary>
-    /// Class that represents the data to send to API /auth
+    /// The actual rights asked, composed of a set of paths and authorized methods
     /// </summary>
-    public class CredentialRequest
+    [JsonPropertyName("accessRules")]
+    public List<AccessRight> AccessRules { get; set; }
+
+    /// <summary>
+    /// The URL on which to redirect the client when he confirms his credentials
+    /// </summary>
+    [JsonPropertyName("redirection")]
+    public string Redirection { [UsedImplicitly] get; set; }
+
+    public CredentialRequest()
     {
-        /// <summary>
-        /// The actual rights asked, composed of a set of paths and authorized methods
-        /// </summary>
-        [JsonProperty(PropertyName = "accessRules")]
-        public List<AccessRight> AccessRules { get; set; }
+        AccessRules = new List<AccessRight>();
+    }
 
-        /// <summary>
-        /// The URL on which to redirect the client when he confirms his credentials
-        /// </summary>
-        [JsonProperty(PropertyName = "redirection")]
-        public string Redirection { get; set; }
+    /// <summary>
+    /// Initializes a <c>CredentialRequest</c> with a list of <c>AccessRight</c>
+    /// </summary>
+    /// <param name="accessRules">Requested access rights</param>
+    /// <param name="redirection">The URL on which to redirect the client when he confirms his credentials</param>
+    public CredentialRequest(List<AccessRight> accessRules, string redirection)
+    {
+        AccessRules = accessRules;
+        Redirection = redirection;
+    }
 
-        public CredentialRequest()
+    /// <summary>
+    /// Initializes a <c>CredentialRequest</c> without using <c>AccessRight</c>
+    /// </summary>
+    /// <param name="accessRules">Requested access rights</param>
+    /// <param name="redirection">The URL on which to redirect the client when he confirms his credentials</param>
+    public CredentialRequest(IEnumerable<Tuple<string, string>> accessRules, string redirection)
+    {
+        AccessRules = accessRules.Select(r => new AccessRight(r)).ToList();
+        Redirection = redirection;
+    }
+
+    /// <summary>
+    /// Add a new rule to the request
+    /// </summary>
+    /// <param name="rule">The rule to add to the request</param>
+    public void AddRule(AccessRight rule)
+    {
+        AccessRules.Add(rule);
+    }
+
+    /// <summary>
+    /// Add a new rule to the request
+    /// </summary>
+    /// <param name="method">HTTP Method to authorize</param>
+    /// <param name="path">API resource to authorize access to</param>
+    public void AddRule(string method, string path)
+    {
+        AddRule(new AccessRight(method, path));
+    }
+
+    /// <summary>
+    /// Add rules for <c>path</c> pattern, for each methods in <c>methods</c>. This is
+    /// </summary>
+    /// <param name="methods">HTTP Methods to authorize</param>
+    /// <param name="path">API resource to authorize access to</param>
+    public void AddRules(IEnumerable<string> methods, string path)
+    {
+        foreach (var method in methods)
         {
-            AccessRules = new List<AccessRight>();
+            AddRule(method, path);
         }
+    }
 
-        /// <summary>
-        /// Initializes a <c>CredentialRequest</c> with a list of <c>AccessRight</c>
-        /// </summary>
-        /// <param name="accessRules">Requested access rights</param>
-        /// <param name="redirection">The URL on which to redirect the client when he confirms his credentials</param>
-        public CredentialRequest(List<AccessRight> accessRules, string redirection) : base()
-        {
-            AccessRules = accessRules;
-            Redirection = redirection;
-        }
-
-        /// <summary>
-        /// Initializes a <c>CredentialRequest</c> without using <c>AccessRight</c>
-        /// </summary>
-        /// <param name="accessRules">Requested access rights</param>
-        /// <param name="redirection">The URL on which to redirect the client when he confirms his credentials</param>
-        public CredentialRequest(List<Tuple<string, string>> accessRules, string redirection) : base ()
-        {
-            AccessRules = accessRules.Select(r => new AccessRight(r)).ToList();
-            Redirection = redirection;
-        }
-
-        /// <summary>
-        /// Add a new rule to the request
-        /// </summary>
-        /// <param name="rule">The rule to add to the request</param>
-        public void AddRule(AccessRight rule)
-        {
-            AccessRules.Add(rule);
-        }
-
-        /// <summary>
-        /// Add a new rule to the request
-        /// </summary>
-        /// <param name="method">HTTP Method to authorize</param>
-        /// <param name="path">API resource to authorize access to</param>
-        public void AddRule(string method, string path)
-        {
-            AddRule(new AccessRight(method, path));
-        }
-
-        /// <summary>
-        /// Add rules for <c>path</c> pattern, for each methods in <c>methods</c>. This is
-        /// </summary>
-        /// <param name="methods">HTTP Methods to authorize</param>
-        /// <param name="path">API resource to authorize access to</param>
-        public void AddRules(IEnumerable<string> methods, string path)
-        {
-            foreach (var method in methods)
-            {
-                AddRule(method, path);
-            }
-        }
-
-        /// <summary>
-        /// Use this method to grant access on a full API tree. This is the
-        /// recommended way to grant access in the API. It will take care of granting
-        /// the root call *AND* sub-calls for you.
-        /// </summary>
-        /// <param name="methods">HTTP Methods to authorize</param>
-        /// <param name="path">API resource to authorize access to</param>
-        public void AddRecursiveRules(IEnumerable<string> methods, string path)
-        {
-            path = Regex.Replace(path, @"/\*{0,1}$", ""); //Strips ending '/' or '/*'
-            AddRules(methods, path);
-            AddRules(methods, path + "/*");
-        }
+    /// <summary>
+    /// Use this method to grant access on a full API tree. This is the
+    /// recommended way to grant access in the API. It will take care of granting
+    /// the root call *AND* sub-calls for you.
+    /// </summary>
+    /// <param name="methods">HTTP Methods to authorize</param>
+    /// <param name="path">API resource to authorize access to</param>
+    public void AddRecursiveRules(IEnumerable<string> methods, string path)
+    {
+        path = Regex.Replace(path, @"/\*{0,1}$", ""); //Strips ending '/' or '/*'
+        methods = methods.ToArray();
+        AddRules(methods, path);
+        AddRules(methods, path + "/*");
     }
 }

@@ -26,59 +26,50 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
-namespace Ovh.Api.Models
+namespace Ovh.Api.Models;
+
+/// <summary>
+/// Class representing API Access rights composed of paths and methods
+/// </summary>
+public class AccessRight
 {
+    private string _method;
 
     /// <summary>
-    /// Class representing API Access rights composed of paths and methods
+    /// HTTP Method to authorize
     /// </summary>
-    public class AccessRight
+    [JsonPropertyName("method")]
+    public string Method
     {
-        private string _method;
+        get => _method;
+        set => _method = value.ToUpper();
+    }
 
-        /// <summary>
-        /// HTTP Method to authorize
-        /// </summary>
-        [JsonProperty(PropertyName = "method")]
-        public string Method
-        {
-            get
-            {
-                return _method;
-            }
-            set
-            {
-                _method = value.ToUpper();
-            }
-        }
+    /// <summary>
+    /// API resource to authorize access to
+    /// </summary>
+    [JsonPropertyName("path")]
+    public string Path { get; set; }
 
-        /// <summary>
-        /// API resource to authorize access to
-        /// </summary>
-        [JsonProperty(PropertyName = "path")]
-        public string Path { get; set; }
+    /// <summary>
+    /// Initializes an AccessRight based on <paramref name="path"/> and <paramref name="method"/>
+    /// </summary>
+    /// <param name="method">HTTP Method to authorize</param>
+    /// <param name="path">API resource to authorize access to</param>
+    public AccessRight(string method, string path)
+    {
+        Method = method;
+        Path = path;
+    }
 
-        /// <summary>
-        /// Initializes an AccessRight based on <paramref name="path"/> and <paramref name="method"/>
-        /// </summary>
-        /// <param name="method">HTTP Method to authorize</param>
-        /// <param name="path">API resource to authorize access to</param>
-        public AccessRight(string method, string path)
-        {
-            Method = method;
-            Path = path;
-        }
-
-        /// <summary>
-        /// Initializes an AccessRight based on a tuple composed of a path and a method
-        /// </summary>
-        public AccessRight(Tuple<string, string> rule)
-            : this(rule.Item1, rule.Item2)
-        {
-        }
+    /// <summary>
+    /// Initializes an AccessRight based on a tuple composed of a path and a method
+    /// </summary>
+    public AccessRight(Tuple<string, string> rule)
+        : this(rule.Item1, rule.Item2)
+    {
     }
 }

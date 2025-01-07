@@ -1,11 +1,10 @@
 
-namespace Ovh.Test.Models
+namespace Ovh.Test.Models;
+
+public class Address
 {
-    public class Address
-    {
-        public string city { get; set; }
-        public string country { get; set; }
-        public string line1 { get; set; }
-        public string zip { get; set; }
-    }
+    public string City { get; set; }
+    public string Country { get; set; }
+    public string Line1 { get; set; }
+    public string Zip { get; set; }
 }
