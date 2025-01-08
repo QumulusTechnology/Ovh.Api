@@ -32,6 +32,7 @@ using Microsoft.Extensions.FileProviders.Physical;
 using Ovh.Api.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
@@ -67,10 +68,11 @@ namespace Ovh.Api;
 public class ConfigurationManager
 {
     //Locations where to look for configuration file by *increasing* priority
-    private readonly string[] _configPaths = {
+    private readonly string[] _configPaths =
+    [
         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
         AppDomain.CurrentDomain.BaseDirectory
-    };
+    ];
 
     /// <summary>
     /// INI data from the configuration file
@@ -103,26 +105,19 @@ public class ConfigurationManager
     /// <param name="applicationKey">API application key</param>
     /// <param name="applicationSecret">API application secret</param>
     /// <param name="consumerKey">Client consumer key</param>
-    public ConfigurationManager(string endpoint, string applicationKey = null,
-        string applicationSecret = null, string consumerKey = null)
+    public ConfigurationManager(string endpoint, string? applicationKey = null,
+        string? applicationSecret = null, string? consumerKey = null)
     {
-        var config = new Dictionary<string, string>();
-        config.Add("default:endpoint", endpoint);
+        var config = new Dictionary<string, string?> { ["default:endpoint"] = endpoint };
 
-        if (applicationKey != null)
-        {
+        if (applicationKey != null) 
             config.Add($"{endpoint}:application_key", applicationKey);
-        }
 
-        if (applicationSecret != null)
-        {
+        if (applicationSecret != null) 
             config.Add($"{endpoint}:application_secret", applicationSecret);
-        }
 
-        if (consumerKey != null)
-        {
+        if (consumerKey != null) 
             config.Add($"{endpoint}:consumer_key", consumerKey);
-        }
 
         Config = new ConfigurationBuilder().AddInMemoryCollection(config).Build();
     }
@@ -142,9 +137,7 @@ public class ConfigurationManager
     {
         var envValue = Environment.GetEnvironmentVariable("OVH_" + name.ToUpper());
         if(envValue != null)
-        {
             return envValue;
-        }
 
         var sectionData = Config
             .GetChildren()
@@ -172,7 +165,7 @@ public class ConfigurationManager
     /// <param name="name">The parameter name</param>
     /// <param name="value">The found value</param>
     /// <returns>True if the call succeeded or false otherwise</returns>
-    public bool TryGet(string section, string name, out string value)
+    public bool TryGet(string section, string name,[NotNullWhen(true)] out string? value)
     {
         value = null;
         try

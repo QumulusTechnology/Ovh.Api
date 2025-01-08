@@ -52,19 +52,14 @@ public class CredentialRequest
     [JsonPropertyName("redirection")]
     public string Redirection { [UsedImplicitly] get; set; }
 
-    public CredentialRequest()
-    {
-        AccessRules = new List<AccessRight>();
-    }
-
     /// <summary>
     /// Initializes a <c>CredentialRequest</c> with a list of <c>AccessRight</c>
     /// </summary>
     /// <param name="accessRules">Requested access rights</param>
     /// <param name="redirection">The URL on which to redirect the client when he confirms his credentials</param>
-    public CredentialRequest(List<AccessRight> accessRules, string redirection)
+    public CredentialRequest(List<AccessRight>? accessRules, string redirection)
     {
-        AccessRules = accessRules;
+        AccessRules = accessRules ?? [];
         Redirection = redirection;
     }
 
@@ -83,20 +78,16 @@ public class CredentialRequest
     /// Add a new rule to the request
     /// </summary>
     /// <param name="rule">The rule to add to the request</param>
-    public void AddRule(AccessRight rule)
-    {
+    public void AddRule(AccessRight rule) => 
         AccessRules.Add(rule);
-    }
 
     /// <summary>
     /// Add a new rule to the request
     /// </summary>
     /// <param name="method">HTTP Method to authorize</param>
     /// <param name="path">API resource to authorize access to</param>
-    public void AddRule(string method, string path)
-    {
+    public void AddRule(string method, string path) => 
         AddRule(new AccessRight(method, path));
-    }
 
     /// <summary>
     /// Add rules for <c>path</c> pattern, for each methods in <c>methods</c>. This is
@@ -105,10 +96,8 @@ public class CredentialRequest
     /// <param name="path">API resource to authorize access to</param>
     public void AddRules(IEnumerable<string> methods, string path)
     {
-        foreach (var method in methods)
-        {
+        foreach (var method in methods) 
             AddRule(method, path);
-        }
     }
 
     /// <summary>

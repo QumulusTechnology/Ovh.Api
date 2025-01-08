@@ -34,11 +34,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.IdentityModel.JsonWebTokens;
 using TimeProvider = Ovh.Api.Testing.TimeProvider;
 
 namespace Ovh.Api;
@@ -77,15 +80,19 @@ public partial class Client
     /// <summary>
     /// API application Key
     /// </summary>
-    public string ApplicationKey { get; set; }
+    public string? ApplicationKey { get; set; }
     /// <summary>
     /// API application secret
     /// </summary>
-    public string ApplicationSecret { get; set; }
+    public string? ApplicationSecret { get; set; }
+    /// <summary>
+    /// JSON Web Bearer Token
+    /// </summary>
+    public string? JsonWebBearerToken { get; set; }
     /// <summary>
     /// Consumer key that can be either <see cref="ConsumerKey">generated</see> or passed to the <see cref="ConfigurationManager">configuration manager</see>>
     /// </summary>
-    public string ConsumerKey { get; set; }
+    public string? ConsumerKey { get; set; }
 
     /// <summary>
     /// Character that will be considered as a value separator
@@ -116,12 +123,14 @@ public partial class Client
     /// <param name="applicationKey">Application key as provided by OVH</param>
     /// <param name="applicationSecret">Application secret key as provided by OVH</param>
     /// <param name="consumerKey">User token as provided by OVH</param>
+    /// <param name="jsonWebBearerToken"></param>
     /// <param name="defaultTimeout">Connection timeout for each request</param>
     /// <param name="parameterSeparator">Separator that should be used when sending Batch Requests</param>
     /// <param name="httpClient"></param>
     /// <param name="confFileName"></param>
     public Client(string? endpoint = null, string? applicationKey = null,
         string? applicationSecret = null, string? consumerKey = null,
+        string? jsonWebBearerToken = null,
         TimeSpan? defaultTimeout = null, char parameterSeparator = ',',
         HttpClient? httpClient = null, string confFileName = ".ovh.conf")
     {
@@ -137,7 +146,7 @@ public partial class Client
 
         try
         {
-            endpoint = endpoint ?? ConfigurationManager.Get("default", "endpoint");
+            endpoint ??= ConfigurationManager.Get("default", "endpoint");
             if (endpoint is null)
                 throw new InvalidRegionException("Endpoint cannot be null.");
             Endpoint = new Uri(_endpoints[endpoint]);
@@ -159,9 +168,14 @@ public partial class Client
         ApplicationSecret = applicationSecret;
 
         //ConsumerKey
-        if (string.IsNullOrWhiteSpace(consumerKey)) 
+        if (string.IsNullOrWhiteSpace(consumerKey))
             ConfigurationManager.TryGet(endpoint, "consumer_key", out consumerKey);
         ConsumerKey = consumerKey;
+
+        // JsonWebBearerToken
+        if (string.IsNullOrWhiteSpace(jsonWebBearerToken))
+            ConfigurationManager.TryGet(endpoint, "jwt_bearer", out jsonWebBearerToken);
+        JsonWebBearerToken = jsonWebBearerToken;
 
         ParameterSeparator = parameterSeparator;
 
@@ -242,6 +256,19 @@ public partial class Client
 
         if (!needAuth)
             return;
+
+        if(JsonWebBearerToken is {} jwtString && ((Func<string,JsonWebToken?>)(s=>
+           {
+               try
+               {
+                   return new JsonWebToken(s);
+               }
+               catch
+               {
+                   return null;
+               }
+           }))(jwtString) is {} jwt)
+            headers.Authorization = new AuthenticationHeaderValue("Bearer", jwt.UnsafeToString());
 
         if (ApplicationSecret == null)
             throw new InvalidKeyException("Application secret is missing.");
