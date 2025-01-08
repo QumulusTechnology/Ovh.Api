@@ -139,36 +139,28 @@ public partial class Client
         {
             endpoint = endpoint ?? ConfigurationManager.Get("default", "endpoint");
             if (endpoint is null)
-            {
                 throw new InvalidRegionException("Endpoint cannot be null.");
-            }
             Endpoint = new Uri(_endpoints[endpoint]);
         }
         catch (KeyNotFoundException)
         {
             throw new InvalidRegionException(
-                $"Unknown endpoint {endpoint}. Valid endpoints: {string.Join(",", _endpoints.Keys)}");
+                $"Unknown endpoint {endpoint}. Valid endpoints: {string.Join(',', _endpoints.Keys)}");
         }
 
         //ApplicationKey
-        if (string.IsNullOrWhiteSpace(applicationKey))
-        {
+        if (string.IsNullOrWhiteSpace(applicationKey)) 
             ConfigurationManager.TryGet(endpoint, "application_key", out applicationKey);
-        }
         ApplicationKey = applicationKey;
 
         //SecretKey
-        if (string.IsNullOrWhiteSpace(applicationSecret))
-        {
+        if (string.IsNullOrWhiteSpace(applicationSecret)) 
             ConfigurationManager.TryGet(endpoint, "application_secret", out applicationSecret);
-        }
         ApplicationSecret = applicationSecret;
 
         //ConsumerKey
-        if (string.IsNullOrWhiteSpace(consumerKey))
-        {
+        if (string.IsNullOrWhiteSpace(consumerKey)) 
             ConfigurationManager.TryGet(endpoint, "consumer_key", out consumerKey);
-        }
         ConsumerKey = consumerKey;
 
         ParameterSeparator = parameterSeparator;
@@ -221,7 +213,7 @@ public partial class Client
             SHA1.HashData(
                     Encoding.UTF8.GetBytes(
                         string.Join(
-                            "+",
+                            '+',
                             applicationSecret, consumerKey, method, target, data, currentTimestamp)
                         )
                     )
@@ -344,7 +336,7 @@ public partial class Client
 
     #endregion
 
-    private async Task<ApiException> ExtractExceptionFromHttpResponse(HttpResponseMessage response)
+    private static async Task<ApiException> ExtractExceptionFromHttpResponse(HttpResponseMessage response)
     {
         var responseStr = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         var responseJsonElement = JsonSerializer.Deserialize<JsonDocument>(responseStr)!.RootElement;

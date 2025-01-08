@@ -13,23 +13,21 @@ namespace Ovh.Test;
 [TestFixture]
 public class DeleteRequests
 {
-    static long _currentClientTimestamp = 1566485765;
-    static long _currentServerTimestamp = 1566485767;
-    static DateTimeOffset _currentDateTime = DateTimeOffset.FromUnixTimeSeconds(_currentClientTimestamp);
-    static ITimeProvider _timeProvider = A.Fake<ITimeProvider>();
+    private const long CurrentClientTimestamp = 1566485765;
+    private const long CurrentServerTimestamp = 1566485767;
+    private static readonly DateTimeOffset CurrentDateTime = DateTimeOffset.FromUnixTimeSeconds(CurrentClientTimestamp);
+    private static readonly ITimeProvider TimeProvider = A.Fake<ITimeProvider>();
 
     public DeleteRequests()
     {
-        A.CallTo(() => _timeProvider.UtcNow).Returns(_currentDateTime);
+        A.CallTo(() => TimeProvider.UtcNow).Returns(CurrentDateTime);
     }
 
-    public static void MockAuthTimeCallWithFakeItEasy(FakeHttpMessageHandler fake)
-    {
+    public static void MockAuthTimeCallWithFakeItEasy(FakeHttpMessageHandler fake) =>
         A.CallTo(() =>
                 fake.Send(A<HttpRequestMessage>.That.Matches(
                     r => r.RequestUri.ToString().Contains("/auth/time"))))
             .Returns(Responses.Get.time_message);
-    }
 
     [Test]
     public async Task DELETE_as_string()
@@ -55,7 +53,7 @@ public class DeleteRequests
         Assert.Multiple(() => {
             ClassicAssert.AreEqual(Constants.ApplicationKey, headers.GetValues(Client.OvhAppHeader).First());
             ClassicAssert.AreEqual(Constants.ConsumerKey, headers.GetValues(Client.OvhConsumerHeader).First());
-            ClassicAssert.AreEqual(_currentServerTimestamp.ToString(), headers.GetValues(Client.OvhTimeHeader).First());
+            ClassicAssert.AreEqual(CurrentServerTimestamp.ToString(), headers.GetValues(Client.OvhTimeHeader).First());
             ClassicAssert.AreEqual("$1$610ebc657a19d6b444264f998291a4f24bc3227d", headers.GetValues(Client.OvhSignatureHeader).First());
         });
     }
