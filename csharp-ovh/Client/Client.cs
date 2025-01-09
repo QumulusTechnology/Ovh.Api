@@ -35,7 +35,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -257,18 +256,21 @@ public partial class Client
         if (!needAuth)
             return;
 
-        if(JsonWebBearerToken is {} jwtString && ((Func<string,JsonWebToken?>)(s=>
-           {
-               try
-               {
-                   return new JsonWebToken(s);
-               }
-               catch
-               {
-                   return null;
-               }
-           }))(jwtString) is {} jwt)
+        if (JsonWebBearerToken is { } jwtString && ((Func<string, JsonWebToken?>)(s =>
+            {
+                try
+                {
+                    return new JsonWebToken(s);
+                }
+                catch
+                {
+                    return null;
+                }
+            }))(jwtString) is { } jwt)
+        {
             headers.Authorization = new AuthenticationHeaderValue("Bearer", jwt.UnsafeToString());
+            return;
+        }
 
         if (ApplicationSecret == null)
             throw new InvalidKeyException("Application secret is missing.");
