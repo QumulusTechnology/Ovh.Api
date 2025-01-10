@@ -68,8 +68,8 @@ public class AccessRight
     /// <summary>
     /// Initializes an AccessRight based on a tuple composed of a path and a method
     /// </summary>
-    public AccessRight(Tuple<string, string> rule)
-        : this(rule.Item1, rule.Item2)
+    public AccessRight((string method, string path) rule)
+        : this(rule.method, rule.path)
     {
     }
 }

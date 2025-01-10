@@ -26,7 +26,6 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -68,7 +67,7 @@ public class CredentialRequest
     /// </summary>
     /// <param name="accessRules">Requested access rights</param>
     /// <param name="redirection">The URL on which to redirect the client when he confirms his credentials</param>
-    public CredentialRequest(IEnumerable<Tuple<string, string>> accessRules, string redirection)
+    public CredentialRequest(IEnumerable<(string method, string path)> accessRules, string redirection)
     {
         AccessRules = accessRules.Select(r => new AccessRight(r)).ToList();
         Redirection = redirection;
