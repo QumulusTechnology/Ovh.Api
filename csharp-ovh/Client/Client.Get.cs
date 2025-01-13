@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ovh.Api;
@@ -13,10 +14,11 @@ public partial class Client
     /// <param name="kwargs">Arguments to append to URL</param>
     /// <param name="needAuth">If true, send authentication headers</param>
     /// <param name="timeout">If specified, overrides default <see cref="Client"/>'s timeout with a custom one</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>Raw API response</returns>
-    public Task<string> GetAsync(string target, QueryStringParams? kwargs = null, bool needAuth = true, TimeSpan? timeout = null)
+    public Task<string> GetAsync(string target, QueryStringParams? kwargs = null, bool needAuth = true, TimeSpan? timeout = null, CancellationToken cancellationToken = default)
         => 
-            CallAsync("GET", $"{target}{kwargs}", null, needAuth, timeout: timeout);
+            CallAsync("GET", $"{target}{kwargs}", null, needAuth, timeout: timeout, cancellationToken: cancellationToken);
 
     /// <summary>
     /// Issues an async batch GET call
@@ -25,10 +27,11 @@ public partial class Client
     /// <param name="kwargs">Arguments to append to URL</param>
     /// <param name="needAuth">If true, send authentication headers</param>
     /// <param name="timeout">If specified, overrides default <see cref="Client"/>'s timeout with a custom one</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>Raw API response</returns>
-    public Task<string> GetBatchAsync(string target, QueryStringParams? kwargs = null, bool needAuth = true, TimeSpan? timeout = null) 
+    public Task<string> GetBatchAsync(string target, QueryStringParams? kwargs = null, bool needAuth = true, TimeSpan? timeout = null, CancellationToken cancellationToken = default) 
         => 
-            CallAsync("GET", $"{target}{kwargs}", null, needAuth, isBatch: true, timeout: timeout);
+            CallAsync("GET", $"{target}{kwargs}", null, needAuth, isBatch: true, timeout: timeout, cancellationToken: cancellationToken);
 
     /// <summary>
     /// Issues an async GET call with an expected return type
@@ -38,10 +41,11 @@ public partial class Client
     /// <param name="kwargs">Arguments to append to URL</param>
     /// <param name="needAuth">If true, send authentication headers</param>
     /// <param name="timeout">If specified, overrides default <see cref="Client"/>'s timeout with a custom one</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>API response deserialized to T by JSON.Net</returns>
-    public Task<T?> GetAsync<T>(string target, QueryStringParams? kwargs = null, bool needAuth = true, TimeSpan? timeout = null) 
+    public Task<T?> GetAsync<T>(string target, QueryStringParams? kwargs = null, bool needAuth = true, TimeSpan? timeout = null, CancellationToken cancellationToken = default) 
         => 
-            CallAsync<T>("GET", $"{target}{kwargs}", null, needAuth, timeout: timeout);
+            CallAsync<T>("GET", $"{target}{kwargs}", null, needAuth, timeout: timeout, cancellationToken: cancellationToken);
 
     /// <summary>
     /// Issues an async batch GET call with an expected return type
@@ -51,8 +55,9 @@ public partial class Client
     /// <param name="kwargs">Arguments to append to URL</param>
     /// <param name="needAuth">If true, send authentication headers</param>
     /// <param name="timeout">If specified, overrides default <see cref="Client"/>'s timeout with a custom one</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>API response deserialized to List&lt;T&gt; by JSON.Net</returns>
-    public Task<List<T>?> GetBatchAsync<T>(string target, QueryStringParams? kwargs = null, bool needAuth = true, TimeSpan? timeout = null) 
+    public Task<List<T>?> GetBatchAsync<T>(string target, QueryStringParams? kwargs = null, bool needAuth = true, TimeSpan? timeout = null, CancellationToken cancellationToken = default) 
         => 
-            CallAsync<List<T>>("GET", $"{target}{kwargs}", null, needAuth, isBatch: true, timeout: timeout);
+            CallAsync<List<T>>("GET", $"{target}{kwargs}", null, needAuth, isBatch: true, timeout: timeout, cancellationToken: cancellationToken);
 }

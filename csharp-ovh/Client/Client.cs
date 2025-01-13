@@ -157,12 +157,12 @@ public partial class Client
         }
 
         //ApplicationKey
-        if (string.IsNullOrWhiteSpace(applicationKey)) 
+        if (string.IsNullOrWhiteSpace(applicationKey))
             ConfigurationManager.TryGet(endpoint, "application_key", out applicationKey);
         ApplicationKey = applicationKey;
 
         //SecretKey
-        if (string.IsNullOrWhiteSpace(applicationSecret)) 
+        if (string.IsNullOrWhiteSpace(applicationSecret))
             ConfigurationManager.TryGet(endpoint, "application_secret", out applicationSecret);
         ApplicationSecret = applicationSecret;
 
@@ -200,10 +200,11 @@ public partial class Client
     /// Generates an async <c>ConsumerKey</c> request
     /// </summary>
     /// <param name="credentialRequest">The exact request to issue</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>A result with the confirmation URL returned by the API</returns>
-    public Task<CredentialRequestResult?> RequestConsumerKeyAsync(CredentialRequest credentialRequest)
-        => 
-            PostAsync<CredentialRequestResult>("/auth/credential", credentialRequest, false);
+    public Task<CredentialRequestResult?> RequestConsumerKeyAsync(CredentialRequest credentialRequest, CancellationToken cancellationToken)
+        =>
+            PostAsync<CredentialRequestResult>("/auth/credential", credentialRequest, false, cancellationToken: cancellationToken);
 
     /// <summary>
     /// Generates a signature for OVH's APÏ
@@ -222,7 +223,7 @@ public partial class Client
     /// <returns></returns>
     public static string GenerateSignature(string applicationSecret, string consumerKey, long currentTimestamp, string method, string target, string? data = null) =>
         $"$1${string.Join(
-            "", 
+            "",
             SHA1.HashData(
                     Encoding.UTF8.GetBytes(
                         string.Join(
@@ -235,7 +236,7 @@ public partial class Client
 
     private string GetTarget(string path)
     {
-        if (path.StartsWith('/')) 
+        if (path.StartsWith('/'))
             path = path[1..];
 
         var endpoint = Endpoint.ToString();
@@ -245,12 +246,12 @@ public partial class Client
         return new Uri(endpoint) + path;
     }
 
-    private async Task SetHeaders(HttpRequestMessage msg, string method, string target, string? data, bool needAuth, bool isBatch = false)
+    private async Task SetHeaders(HttpRequestMessage msg, string method, string target, string? data, bool needAuth, bool isBatch = false, CancellationToken cancellationToken = default)
     {
         var headers = msg.Headers;
         headers.Add(OvhAppHeader, ApplicationKey);
 
-        if (isBatch) 
+        if (isBatch)
             headers.Add(OvhBatchHeader, ParameterSeparator.ToString());
 
         if (!needAuth)
@@ -274,11 +275,11 @@ public partial class Client
 
         if (ApplicationSecret == null)
             throw new InvalidKeyException("Application secret is missing.");
-        
+
         if (ConsumerKey == null)
             throw new InvalidKeyException("ConsumerKey is missing.");
 
-        var currentTimestamp = _timeProvider.UtcNow.ToUnixTimeSeconds() + await GetTimeDelta().ConfigureAwait(false);
+        var currentTimestamp = _timeProvider.UtcNow.ToUnixTimeSeconds() + await GetTimeDelta(cancellationToken).ConfigureAwait(false);
         var signature = GenerateSignature(
             applicationSecret: ApplicationSecret,
             consumerKey: ConsumerKey,
@@ -300,11 +301,11 @@ public partial class Client
     /// This method is *lazy*. It will only load it once even though it is used
     /// for each request.
     /// </summary>
-    public async Task<long> GetTimeDelta()
+    public async Task<long> GetTimeDelta(CancellationToken cancellationToken)
     {
         if (!_isTimeDeltaInitialized)
         {
-            _timeDelta = await ComputeTimeDelta().ConfigureAwait(false);
+            _timeDelta = await ComputeTimeDelta(cancellationToken).ConfigureAwait(false);
             _isTimeDeltaInitialized = true;
         }
         return _timeDelta;
@@ -329,24 +330,27 @@ public partial class Client
     /// <param name="needAuth">if False, bypass signature</param>
     /// <param name="isBatch">If true, this will query multiple resources in one call</param>
     /// <param name="timeout">If specified, overrides default <see cref="Client"/>'s timeout with a custom one</param>
+    /// <param name="cancellationToken"></param>
     /// <exception cref="HttpException">When underlying request failed for network reason</exception>
     /// <exception cref="InvalidResponseException">when API response could not be decoded</exception>
-    private async Task<string> CallAsync(string method, string path, string? data = null, bool needAuth = true, bool isBatch = false, TimeSpan? timeout = null)
+    private async Task<string> CallAsync(string method, string path, string? data = null, bool needAuth = true, bool isBatch = false, TimeSpan? timeout = null, CancellationToken cancellationToken = default)
     {
         HttpResponseMessage response;
-
+        using var timeoutCancellation = new CancellationTokenSource(timeout ?? _defaultTimeout);
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCancellation.Token);
+        cancellationToken = cts.Token;
         try
         {
             var httpMethod = new HttpMethod(method);
             var target = GetTarget(path);
             var msg = new HttpRequestMessage(httpMethod, target);
-            if (httpMethod != HttpMethod.Get && data != null) 
+            if (httpMethod != HttpMethod.Get && data != null)
                 msg.Content = new StringContent(data, Encoding.UTF8, "application/json");
 
-            await SetHeaders(msg, method, target, data, needAuth, isBatch).ConfigureAwait(false);
 
-            using var cts = new CancellationTokenSource(timeout ?? _defaultTimeout);
-            response = await _httpClient.SendAsync(msg, cts.Token).ConfigureAwait(false);
+            await SetHeaders(msg, method, target, data, needAuth, isBatch, cancellationToken).ConfigureAwait(false);
+
+            response = await _httpClient.SendAsync(msg, cancellationToken).ConfigureAwait(false);
         }
         catch (HttpRequestException e)
         {
@@ -354,27 +358,27 @@ public partial class Client
         }
 
         if (response.StatusCode == HttpStatusCode.OK)
-            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
-        throw await ExtractExceptionFromHttpResponse(response).ConfigureAwait(false);
+        throw await ExtractExceptionFromHttpResponse(response, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task<T?> CallAsync<T>(string method, string path, string? data = null, bool needAuth = true, bool isBatch = false, TimeSpan? timeout = null) 
-        => 
-            JsonSerializer.Deserialize<T>(await CallAsync(method, path, data, needAuth, isBatch, timeout).ConfigureAwait(false));
+    private async Task<T?> CallAsync<T>(string method, string path, string? data = null, bool needAuth = true, bool isBatch = false, TimeSpan? timeout = null, CancellationToken cancellationToken = default)
+        =>
+            JsonSerializer.Deserialize<T>(await CallAsync(method, path, data, needAuth, isBatch, timeout, cancellationToken).ConfigureAwait(false));
 
     #endregion
 
-    private static async Task<ApiException> ExtractExceptionFromHttpResponse(HttpResponseMessage response)
+    private static async Task<ApiException> ExtractExceptionFromHttpResponse(HttpResponseMessage response, CancellationToken cancellationToken)
     {
-        var responseStr = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var responseStr = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var responseJsonElement = JsonSerializer.Deserialize<JsonDocument>(responseStr)!.RootElement;
         var message = responseJsonElement.TryGetProperty("message", out var value) &&
-                      value.ValueKind == JsonValueKind.String && value.GetString() is {} m
+                      value.ValueKind == JsonValueKind.String && value.GetString() is { } m
             ? m
             : "";
         var errorCode = responseJsonElement.TryGetProperty("errorCode", out value) &&
-                        value.ValueKind == JsonValueKind.String && value.GetString() is {} e
+                        value.ValueKind == JsonValueKind.String && value.GetString() is { } e
             ? e
             : "";
 
@@ -407,7 +411,7 @@ public partial class Client
         }
     }
 
-    private async Task<long> ComputeTimeDelta() 
-        => 
-            await GetAsync<long>("/auth/time", null, false).ConfigureAwait(false) - _timeProvider.UtcNow.ToUnixTimeSeconds();
+    private async Task<long> ComputeTimeDelta(CancellationToken cancellationToken)
+        =>
+            await GetAsync<long>("/auth/time", null, false, cancellationToken: cancellationToken).ConfigureAwait(false) - _timeProvider.UtcNow.ToUnixTimeSeconds();
 }
