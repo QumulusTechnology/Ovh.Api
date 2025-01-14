@@ -42,7 +42,7 @@ public class GetRequests
         var httpClient = new HttpClient(testHandler);
         var c = new Client("ovh-eu", httpClient: httpClient).AsTestable(_timeProvider);
 
-        ClassicAssert.AreEqual(2, await c.GetTimeDelta());
+        ClassicAssert.AreEqual(2, await c.GetTimeDelta(CancellationToken.None));
     }
 
     [Test]
