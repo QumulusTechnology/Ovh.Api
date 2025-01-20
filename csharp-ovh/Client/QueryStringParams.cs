@@ -17,6 +17,11 @@ public class QueryStringParams : List<(string, string)>
         Add((key, value));
     }
 
+    public void Add(IEnumerable<(string key, string value)> items)
+    {
+        foreach (var (key, value) in items) Add(key, value);
+    }
+
     public override string ToString()
     {
         var sb = new StringBuilder();

@@ -28,7 +28,7 @@
 
 using System;
 
-namespace Ovh.Api.Exceptions;
+namespace Ovh.Api;
 
 /// <summary>
 /// Base OVH API exception, all specific exceptions inherits from it.

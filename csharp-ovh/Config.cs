@@ -29,7 +29,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
-using Ovh.Api.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -110,13 +109,13 @@ public class ConfigurationManager
     {
         var config = new Dictionary<string, string?> { ["default:endpoint"] = endpoint };
 
-        if (applicationKey != null) 
+        if (applicationKey != null)
             config.Add($"{endpoint}:application_key", applicationKey);
 
-        if (applicationSecret != null) 
+        if (applicationSecret != null)
             config.Add($"{endpoint}:application_secret", applicationSecret);
 
-        if (consumerKey != null) 
+        if (consumerKey != null)
             config.Add($"{endpoint}:consumer_key", consumerKey);
 
         Config = new ConfigurationBuilder().AddInMemoryCollection(config).Build();
@@ -133,30 +132,17 @@ public class ConfigurationManager
     /// <param name="name">Configuration parameter to lookup</param>
     /// <returns>The value of the looked up configuration</returns>
     /// <exception cref="KeyNotFoundException">Configuration key is missing</exception>
-    public string Get(string section, string name)
-    {
-        var envValue = Environment.GetEnvironmentVariable("OVH_" + name.ToUpper());
-        if(envValue != null)
-            return envValue;
-
-        var sectionData = Config
-            .GetChildren()
-            .FirstOrDefault(s => s.Key == section);
-
-        if (sectionData == null)
-        {
-            throw new ConfigurationKeyMissingException(
-                string.Format($"Could not find configuration section {section}"));
-        }
-
-        var value = sectionData.GetSection(name);
-        if (value.Value == null)
-        {
-            throw new ConfigurationKeyMissingException(
-                string.Format($"Could not find configuration key {name} in section {section}"));
-        }
-        return value.Value;
-    }
+    public string Get(string section, string name) =>
+        Environment.GetEnvironmentVariable("OVH_" + name.ToUpper()) ??
+        (Config.GetChildren().FirstOrDefault(s => s.Key == section) is not
+            { } sectionData
+            ? throw new ConfigurationKeyMissingException(
+                string.Format(
+                    $"Could not find configuration section {section}"))
+            : sectionData.GetSection(name).Value ??
+              throw new ConfigurationKeyMissingException(
+                  string.Format(
+                      $"Could not find configuration key {name} in section {section}")));
 
     /// <summary>
     /// Tries to get a the parameter <paramref name="name"/> from the section <paramref name="section"/>
@@ -165,7 +151,7 @@ public class ConfigurationManager
     /// <param name="name">The parameter name</param>
     /// <param name="value">The found value</param>
     /// <returns>True if the call succeeded or false otherwise</returns>
-    public bool TryGet(string section, string name,[NotNullWhen(true)] out string? value)
+    public bool TryGet(string section, string name, [NotNullWhen(true)] out string? value)
     {
         value = null;
         try

@@ -26,9 +26,6 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-using Ovh.Api.Exceptions;
-using Ovh.Api.Models;
-using Ovh.Api.Testing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +38,8 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Ovh.Api.Models;
+using Ovh.Api.Testing;
 using TimeProvider = Ovh.Api.Testing.TimeProvider;
 
 namespace Ovh.Api;
@@ -62,7 +61,7 @@ public partial class Client
     public const string OvhSignatureHeader = "X-Ovh-Signature";
     public const string OvhBatchHeader = "X-Ovh-Batch";
 
-    private readonly Dictionary<string, string> _endpoints = new();
+    private readonly Dictionary<string, string> _endpoints = [];
 
     private readonly TimeSpan _defaultTimeout = TimeSpan.FromSeconds(180);
 
@@ -116,16 +115,16 @@ public partial class Client
     /// them from environment, %USERPROFILE%/.ovh.cfg and finally current_dir/.ovh.cfg.
     /// </summary>
     /// <remarks><c>timeout</c> will be taken into account only at the first
-    /// instantiation of an <see cref="Ovh.Api.Client"/> because the <c>HttpClient</c> used
+    /// instantiation of an <see cref="endpoint"/> because the <c>HttpClient</c> used
     /// by it is static</remarks>
-    /// <param name="endpoint">API endpoint to use. Valid values in "Endpoints"</param>
-    /// <param name="applicationKey">Application key as provided by OVH</param>
-    /// <param name="applicationSecret">Application secret key as provided by OVH</param>
-    /// <param name="consumerKey">User token as provided by OVH</param>
-    /// <param name="jsonWebBearerToken"></param>
-    /// <param name="defaultTimeout">Connection timeout for each request</param>
-    /// <param name="parameterSeparator">Separator that should be used when sending Batch Requests</param>
-    /// <param name="httpClient"></param>
+    /// <param name="applicationKey">API endpoint to use. Valid values in "Endpoints"</param>
+    /// <param name="applicationSecret">Application key as provided by OVH</param>
+    /// <param name="consumerKey">Application secret key as provided by OVH</param>
+    /// <param name="jsonWebBearerToken">User token as provided by OVH</param>
+    /// <param name="defaultTimeout"></param>
+    /// <param name="parameterSeparator">Connection timeout for each request</param>
+    /// <param name="httpClient">Separator that should be used when sending Batch Requests</param>
+    /// <param name="confFileName"></param>
     /// <param name="confFileName"></param>
     public Client(string? endpoint = null, string? applicationKey = null,
         string? applicationSecret = null, string? consumerKey = null,
@@ -358,14 +357,17 @@ public partial class Client
         }
 
         if (response.StatusCode == HttpStatusCode.OK)
-            return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        {
+            var responseString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            return responseString;
+        }
 
         throw await ExtractExceptionFromHttpResponse(response, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task<T?> CallAsync<T>(string method, string path, string? data = null, bool needAuth = true, bool isBatch = false, TimeSpan? timeout = null, CancellationToken cancellationToken = default)
-        =>
-            JsonSerializer.Deserialize<T>(await CallAsync(method, path, data, needAuth, isBatch, timeout, cancellationToken).ConfigureAwait(false));
+    private async Task<T?> CallAsync<T>(string method, string path, string? data = null, bool needAuth = true, bool isBatch = false, TimeSpan? timeout = null, CancellationToken cancellationToken = default) =>
+        JsonSerializer.Deserialize<T>(
+            await CallAsync(method, path, data, needAuth, isBatch, timeout, cancellationToken).ConfigureAwait(false));
 
     #endregion
 
