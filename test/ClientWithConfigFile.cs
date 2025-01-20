@@ -3,7 +3,6 @@ using System.IO;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Ovh.Api;
-using Ovh.Api.Exceptions;
 
 namespace Ovh.Test;
 
@@ -58,7 +57,7 @@ public class ClientWithConfigFile
     public void InvalidConfigFile()
     {
         CreateInvalidConfigFile();
-        Assert.Throws(typeof(FormatException), () => new Client());
+        Assert.Throws(typeof(InvalidDataException), () => new Client());
     }
 
     [Test]

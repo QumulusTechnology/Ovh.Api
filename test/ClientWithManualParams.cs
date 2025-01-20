@@ -1,7 +1,6 @@
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Ovh.Api;
-using Ovh.Api.Exceptions;
 using System;
 
 namespace Ovh.Test;

@@ -117,6 +117,7 @@ public partial class Client
     /// <remarks><c>timeout</c> will be taken into account only at the first
     /// instantiation of an <see cref="endpoint"/> because the <c>HttpClient</c> used
     /// by it is static</remarks>
+    /// <param name="endpoint"></param>
     /// <param name="applicationKey">API endpoint to use. Valid values in "Endpoints"</param>
     /// <param name="applicationSecret">Application key as provided by OVH</param>
     /// <param name="consumerKey">Application secret key as provided by OVH</param>
@@ -124,7 +125,6 @@ public partial class Client
     /// <param name="defaultTimeout"></param>
     /// <param name="parameterSeparator">Connection timeout for each request</param>
     /// <param name="httpClient">Separator that should be used when sending Batch Requests</param>
-    /// <param name="confFileName"></param>
     /// <param name="confFileName"></param>
     public Client(string? endpoint = null, string? applicationKey = null,
         string? applicationSecret = null, string? consumerKey = null,
