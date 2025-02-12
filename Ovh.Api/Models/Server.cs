@@ -80,7 +80,9 @@ public class Server
     [JsonPropertyName("iam")]
     public IamDetails? Iam { get; set; }
 
-    public List<(string Mac, string Mode)> NetworkInterfaceControllers{ get; set; } = [];
-    public string Gateway { get; set; }
-    public string Mac { get; set; }
+    public List<(string Mac, string Mode)>? NetworkInterfaceControllers{ get; set; }
+
+    public string? Gateway { get; set; }
+
+    public string? Mac { get; set; }
 }
