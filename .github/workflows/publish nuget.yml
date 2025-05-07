@@ -18,22 +18,24 @@ jobs:
       run: dotnet nuget add source "https://nuget.pkg.github.com/QumulusTechnology/index.json" --name "github" --username "${{ github.actor }}" --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
 
     - name: Set rpository short name
-      run: echo "REPOSITORY_SHORT_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
+      run: |
+          PROJECT_NAME=${GITHUB_REPOSITORY#*/}
+          echo "PROJECT_NAME=${PROJECT_NAME%.Dotnet}" >> $GITHUB_ENV
 
     - name: Remove project to project references [used only durong development and debugging]
       run: >
-        REF_LIST=$(dotnet list ${{ env.REPOSITORY_SHORT_NAME }} reference | tail -n +3) &&
+        REF_LIST=$(dotnet list ${{ env.PROJECT_NAME }} reference | tail -n +3) &&
         [ -z "$REF_LIST" ] ||
-        dotnet remove ${{ env.REPOSITORY_SHORT_NAME }} reference $REF_LIST
+        dotnet remove ${{ env.PROJECT_NAME }} reference $REF_LIST
 
     - name: Restore dependencies
-      run: dotnet restore ${{ env.REPOSITORY_SHORT_NAME }}
+      run: dotnet restore ${{ env.PROJECT_NAME }}
 
     - name: Build
-      run: dotnet build ${{ env.REPOSITORY_SHORT_NAME }} --configuration Release --no-restore
+      run: dotnet build ${{ env.PROJECT_NAME }} --configuration Release --no-restore
 
     - name: Pack
-      run: dotnet pack ${{ env.REPOSITORY_SHORT_NAME }} --configuration Release --no-build --output ./nupkg
+      run: dotnet pack ${{ env.PROJECT_NAME }} --configuration Release --no-build --output ./nupkg
 
     - name: Push to GitHub Packages
       run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "https://nuget.pkg.github.com/QumulusTechnology/index.json"
