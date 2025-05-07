@@ -4,7 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <AssemblyName>Ovh.Api</AssemblyName>
     <Title>OVH C# API Wrapper</Title>
-    <PackageVersion>4.0.5.11</PackageVersion>
+    <PackageVersion>4.0.5.12</PackageVersion>
     <PackageDescription>A set of classes and helpers to make calls to OVH's APIs.</PackageDescription>
     <Authors>Luke Marlin;Julien Loir;Yedidya Heilpern</Authors>
     <RepositoryUrl>https://github.com/QumulusTechnology/csharp-ovh.get</RepositoryUrl>
