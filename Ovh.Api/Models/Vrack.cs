@@ -5,8 +5,8 @@ namespace Ovh.Api.Models;
 public class Vrack
 {
     [JsonPropertyName("bandwidth")]
-    public BandwidthDetail Bandwidth { get; set; }
+    public required BandwidthDetail Bandwidth { get; set; }
 
     [JsonPropertyName("type")]
-    public string Type { get; set; }
+    public required string Type { get; set; }
 }

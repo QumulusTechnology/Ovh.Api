@@ -337,7 +337,7 @@ public partial class Client
         HttpResponseMessage response;
         using var timeoutCancellation = new CancellationTokenSource(timeout ?? _defaultTimeout);
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCancellation.Token);
-        cancellationToken = cts.Token;
+        var finalCancellationToken = cts.Token;
         try
         {
             var httpMethod = new HttpMethod(method);
@@ -347,9 +347,9 @@ public partial class Client
                 msg.Content = new StringContent(data, Encoding.UTF8, "application/json");
 
 
-            await SetHeaders(msg, method, target, data, needAuth, isBatch, cancellationToken).ConfigureAwait(false);
+            await SetHeaders(msg, method, target, data, needAuth, isBatch, finalCancellationToken).ConfigureAwait(false);
 
-            response = await _httpClient.SendAsync(msg, cancellationToken).ConfigureAwait(false);
+            response = await _httpClient.SendAsync(msg, finalCancellationToken).ConfigureAwait(false);
         }
         catch (HttpRequestException e)
         {
@@ -358,11 +358,11 @@ public partial class Client
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
-            var responseString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            var responseString = await response.Content.ReadAsStringAsync(finalCancellationToken).ConfigureAwait(false);
             return responseString;
         }
 
-        throw await ExtractExceptionFromHttpResponse(response, cancellationToken).ConfigureAwait(false);
+        throw await ExtractExceptionFromHttpResponse(response, finalCancellationToken).ConfigureAwait(false);
     }
 
     private async Task<T?> CallAsync<T>(string method, string path, string? data = null, bool needAuth = true, bool isBatch = false, TimeSpan? timeout = null, CancellationToken cancellationToken = default) =>

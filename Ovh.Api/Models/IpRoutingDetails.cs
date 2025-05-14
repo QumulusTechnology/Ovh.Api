@@ -5,11 +5,11 @@ namespace Ovh.Api.Models;
 public class IpRoutingDetails
 {
     [JsonPropertyName("network")]
-    public string Network { get; set; }
+    public required string Network { get; set; }
 
     [JsonPropertyName("gateway")]
-    public string Gateway { get; set; }
+    public required string Gateway { get; set; }
 
     [JsonPropertyName("ip")]
-    public string Ip { get; set; }
+    public required string Ip { get; set; }
 }

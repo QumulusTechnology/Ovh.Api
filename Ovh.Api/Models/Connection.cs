@@ -8,5 +8,5 @@ public class Connection
     public int Value { get; set; }
 
     [JsonPropertyName("unit")]
-    public string Unit { get; set; }
+    public required string Unit { get; set; }
 }

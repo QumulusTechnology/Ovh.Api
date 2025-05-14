@@ -5,8 +5,8 @@ namespace Ovh.Api.Models;
 public class Routing
 {
     [JsonPropertyName("ipv4")]
-    public IpRoutingDetails Ipv4 { get; set; }
+    public required IpRoutingDetails Ipv4 { get; set; }
 
     [JsonPropertyName("ipv6")]
-    public IpRoutingDetails Ipv6 { get; set; }
+    public required IpRoutingDetails Ipv6 { get; set; }
 }

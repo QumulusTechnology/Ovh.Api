@@ -5,26 +5,26 @@ namespace Ovh.Api.Models;
 public class NetworkSpecification
 {
     [JsonPropertyName("ola")]
-    public Ola Ola { get; set; }
+    public required Ola Ola { get; set; }
 
     [JsonPropertyName("traffic")]
-    public Traffic Traffic { get; set; }
+    public required Traffic Traffic { get; set; }
 
     [JsonPropertyName("switching")]
-    public Switching Switching { get; set; }
+    public required Switching Switching { get; set; }
 
     [JsonPropertyName("routing")]
-    public Routing Routing { get; set; }
+    public required Routing Routing { get; set; }
 
     [JsonPropertyName("connection")]
-    public Connection Connection { get; set; }
+    public required Connection Connection { get; set; }
 
     [JsonPropertyName("vrack")]
-    public Vrack Vrack { get; set; }
+    public required Vrack Vrack { get; set; }
 
     [JsonPropertyName("bandwidth")]
-    public Bandwidth Bandwidth { get; set; }
+    public required Bandwidth Bandwidth { get; set; }
 
     [JsonPropertyName("vmac")]
-    public Vmac Vmac { get; set; }
+    public required Vmac Vmac { get; set; }
 }

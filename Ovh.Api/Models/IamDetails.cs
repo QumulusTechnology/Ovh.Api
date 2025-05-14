@@ -5,11 +5,11 @@ namespace Ovh.Api.Models;
 public class IamDetails
 {
     [JsonPropertyName("displayName")]
-    public string DisplayName { get; set; }
+    public required string DisplayName { get; set; }
 
     [JsonPropertyName("id")]
-    public string Id { get; set; }
+    public required string Id { get; set; }
 
     [JsonPropertyName("urn")]
-    public string Urn { get; set; }
+    public required string Urn { get; set; }
 }

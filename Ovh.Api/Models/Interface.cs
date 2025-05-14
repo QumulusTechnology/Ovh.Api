@@ -11,5 +11,5 @@ public class Interface
     public bool Aggregation { get; set; }
 
     [JsonPropertyName("type")]
-    public string Type { get; set; }
+    public required string Type { get; set; }
 }

@@ -5,20 +5,20 @@ namespace Ovh.Api.Models;
 public class Traffic
 {
     [JsonPropertyName("resetQuotaDate")]
-    public string ResetQuotaDate { get; set; }
+    public required string  ResetQuotaDate { get; set; }
 
     [JsonPropertyName("inputQuotaUsed")]
-    public string InputQuotaUsed { get; set; }
+    public required string InputQuotaUsed { get; set; }
 
     [JsonPropertyName("outputQuotaUsed")]
-    public string OutputQuotaUsed { get; set; }
+    public required string OutputQuotaUsed { get; set; }
 
     [JsonPropertyName("isThrottled")]
     public bool IsThrottled { get; set; }
 
     [JsonPropertyName("outputQuotaSize")]
-    public string OutputQuotaSize { get; set; }
+    public required string OutputQuotaSize { get; set; }
 
     [JsonPropertyName("inputQuotaSize")]
-    public string InputQuotaSize { get; set; }
+    public required string InputQuotaSize { get; set; }
 }

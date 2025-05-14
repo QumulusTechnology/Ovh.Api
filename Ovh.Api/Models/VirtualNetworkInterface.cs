@@ -6,23 +6,23 @@ namespace Ovh.Api.Models;
 public class VirtualNetworkInterface
 {
     [JsonPropertyName("vrack")]
-    public string Vrack { get; set; }
+    public required string Vrack { get; set; }
 
     [JsonPropertyName("mode")]
-    public string Mode { get; set; }
+    public required string Mode { get; set; }
 
     [JsonPropertyName("serverName")]
-    public string ServerName { get; set; }
+    public required string ServerName { get; set; }
 
     [JsonPropertyName("enabled")]
-    public bool Enabled { get; set; }
+    public required bool Enabled { get; set; }
 
     [JsonPropertyName("uuid")]
-    public string Uuid { get; set; }
+    public required string Uuid { get; set; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("networkInterfaceController")]
-    public List<string> NetworkInterfaceController { get; set; }
+    public required List<string> NetworkInterfaceController { get; set; }
 }

@@ -60,7 +60,7 @@ public class AccessRight
     /// <param name="path">API resource to authorize access to</param>
     public AccessRight(string method, string path)
     {
-        Method = method;
+        _method = method;
         Path = path;
     }
 

@@ -6,10 +6,10 @@ namespace Ovh.Api.Models;
 public class Ola
 {
     [JsonPropertyName("availableModes")]
-    public List<AvailableMode> AvailableModes { get; set; }
+    public required List<AvailableMode> AvailableModes { get; set; }
 
     [JsonPropertyName("supportedModes")]
-    public List<string> SupportedModes { get; set; }
+    public required List<string> SupportedModes { get; set; }
 
     [JsonPropertyName("available")]
     public bool Available { get; set; }
