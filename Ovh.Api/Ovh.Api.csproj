@@ -4,7 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <AssemblyName>Ovh.Api</AssemblyName>
     <Title>OVH C# API Wrapper</Title>
-    <PackageVersion>4.0.5.14</PackageVersion>
+    <PackageVersion>4.0.5.15</PackageVersion>
     <PackageDescription>A set of classes and helpers to make calls to OVH's APIs.</PackageDescription>
     <Authors>Luke Marlin;Julien Loir;Yedidya Heilpern</Authors>
     <RepositoryUrl>https://github.com/QumulusTechnology/csharp-ovh.get</RepositoryUrl>
@@ -17,7 +17,7 @@
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="9.0.5" />
-    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.10.0" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.11.0" />
     <None Include="../LICENSE" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
