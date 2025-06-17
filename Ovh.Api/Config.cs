@@ -145,7 +145,7 @@ public class ConfigurationManager
                       $"Could not find configuration key {name} in section {section}")));
 
     /// <summary>
-    /// Tries to get a the parameter <paramref name="name"/> from the section <paramref name="section"/>
+    /// Tries to get the parameter <paramref name="name"/> from the section <paramref name="section"/>
     /// </summary>
     /// <param name="section">The section of the INI file to look into</param>
     /// <param name="name">The parameter name</param>
