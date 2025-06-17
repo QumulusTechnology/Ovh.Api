@@ -22,5 +22,5 @@ public class VirtualNetworkInterfacesController : ControllerBase
             .ConfigureAwait(false);
 
 
-    public VirtualNetworkInterfaceController For(string interfaceUuid) => new(this, interfaceUuid);
+    public VirtualNetworkInterfaceController this[string interfaceUuid] => new(this, interfaceUuid);
 }

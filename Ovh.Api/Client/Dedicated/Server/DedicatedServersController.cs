@@ -13,11 +13,13 @@ public class DedicatedServersController : ControllerBase
     {
     }
 
-    public DedicatedServerController For(string serverName)
+    public DedicatedServerController this[string serverName]
     {
-        if (string.IsNullOrWhiteSpace(serverName))
-            throw new ArgumentException("Server name cannot be null, empty or whitespace", nameof(serverName));
-        return new DedicatedServerController(this, serverName);
+        get {
+            if (string.IsNullOrWhiteSpace(serverName))
+                throw new ArgumentException("Server name cannot be null, empty or whitespace", nameof(serverName));
+            return new DedicatedServerController(this, serverName);
+        }
     }
 
     public async Task<IEnumerable<string>?> GetNamesAsync(CancellationToken cancellationToken) =>

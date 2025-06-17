@@ -17,5 +17,5 @@ public class TasksController : ControllerBase
             await OvhApiClient.GetAsync<IEnumerable<uint>>(Path, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
-    public TaskController For(uint taskId) => new(this, taskId);
+    public TaskController this[uint taskId] => new(this, taskId);
 }
