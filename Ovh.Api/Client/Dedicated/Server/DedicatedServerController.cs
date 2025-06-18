@@ -1,7 +1,7 @@
-﻿using Ovh.Api.Models;
-using Ovh.Api.Tasks;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using Ovh.Api.Models;
+using Ovh.Api.Tasks;
 
 namespace Ovh.Api.Dedicated.Server;
 
